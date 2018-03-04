@@ -10,7 +10,7 @@ setup(
             'whruslack = whruslack.whruslack:main',
         ]
     },
-    install_requires=["appdirs"],
+    install_requires=["appdirs", "dbus-python"],
 
     author="Cédric Cabessa",
     author_email="ced@ryick.net",
