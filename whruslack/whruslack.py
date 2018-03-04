@@ -9,7 +9,8 @@ from whruslack import wififactory
 from whruslack.slack import Slack, WhruslackException
 
 def main():
-    logging.basicConfig(level=logging.DEBUG)
+    logging.basicConfig(level=logging.DEBUG,
+                        format="%(levelname)s:%(process)d:%(threadName)s:%(message)s")
     logger = logging.getLogger("whruslack")
 
     configfile = os.path.join(appdirs.user_config_dir("whruslack"),
