@@ -29,11 +29,21 @@ Whruslack use setuptools, so you should simply use:
  $ ./setup.py install --user
 ```
 
-## Usage
+### linux
 
-For now, whruslack is a simple command line tool, you need to call it manually
-everytime you want to change your status.
+On linux, you can add whruslack as a systemd service
 
-You can add it in a crontab if you want
+```
+cp systemd/whruslack.service ~/.config/systemd/user/
+systemctl --user enable whruslack.service
+systemctl --user start whruslack.service
+```
 
-Future version should provide a daemon mode.
+Logs are available with:
+
+```
+journalctl --user -u whruslack.service
+```
+
+Note that `whruslack` use `dbus` and `systemd-logind` to detect shutdown and sleep
+event.

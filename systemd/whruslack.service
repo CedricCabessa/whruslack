@@ -1,0 +1,8 @@
+[Unit]
+Description=Whruslack - Change slack status according to current wifi access point
+
+[Service]
+ExecStart=/usr/bin/env whruslack
+
+[Install]
+WantedBy=default.target
