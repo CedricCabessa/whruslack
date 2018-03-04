@@ -27,6 +27,9 @@ def main():
 
     default_emoji = None
 
+    refresh_period = 60 * int(config['app'].get('refresh_period', 15))
+    logger.debug("refresh_period=%s", refresh_period)
+
     if 'default_emoji' in config['app']:
         default_emoji = config['app']['default_emoji']
 
