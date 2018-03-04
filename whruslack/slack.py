@@ -5,9 +5,6 @@ import logging
 
 logger = logging.getLogger("whruslack")
 
-class WhruslackException(Exception):
-    pass
-
 class Slack:
     def __init__(self, token):
         self.token = token
@@ -17,6 +14,8 @@ class Slack:
             status = ""
         if emoji is None:
             emoji = ""
+
+        logger.info('status "%s" emoji "%s"', status, emoji)
 
         payload = '{"profile": {"status_text": "%s","status_emoji": "%s"}}' % \
                   (status, emoji)
@@ -31,12 +30,9 @@ class Slack:
                 response = json.loads(f.read().decode('utf-8'))
                 if not response['ok']:
                     logger.error('error from slack api: %s', response['error'])
-                    raise WhruslackException(response['error'])
 
         except HTTPError as e:
             logger.error("http errror %s", e)
-            raise WhruslackException(response['error'])
-
 
     def changestatus(self, status, emoji):
         self.__dochangestatus(status, emoji)

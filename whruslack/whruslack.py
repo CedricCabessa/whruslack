@@ -6,7 +6,7 @@ import configparser
 import appdirs
 
 from whruslack import wififactory
-from whruslack.slack import Slack, WhruslackException
+from whruslack.slack import Slack
 
 def main():
     logging.basicConfig(level=logging.DEBUG,
