@@ -8,5 +8,8 @@ class Wifi:
                              stderr=subprocess.DEVNULL)
         match = re.search('Access Point: (([0-9A-Fa-f]{2}:?){6})',
                           out.stdout.decode('utf-8'))
-        return match.group(1)
+        # if we are called when wifi is down (hibernating) do not crash
+        if match:
+            return match.group(1)
 
+        return None
