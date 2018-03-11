@@ -18,23 +18,27 @@ def scan_wifi_and_update_status(slack, roomconfig, default_emoji):
         logger.debug("currentAP is None")
         return
 
-    if currentAP not in roomconfig:
+    for status in roomconfig:
+        if status == 'app' or status == 'DEFAULT':
+            continue
+        room = roomconfig[status]
+        if 'ap' not in room:
+            logger.error("no 'ap' for %s", status)
+            return
+        ap = [ x.strip() for x in room['ap'].split(',') ]
+        if currentAP in ap:
+            emoji = default_emoji
+            if 'emoji' in room:
+                emoji = room['emoji']
+
+            if emoji:
+                slack.changestatus(status, emoji)
+            else:
+                logger.error('"%s" is misconfigured', status)
+            break
+    else:
         logger.info('unknown wifi, reset status')
         slack.resetstatus()
-    else:
-        room = roomconfig[currentAP]
-        status = ""
-        if 'status' in room:
-            status = room['status']
-
-        emoji = default_emoji
-        if 'emoji' in room:
-            emoji = room['emoji']
-
-        if emoji:
-            slack.changestatus(status, emoji)
-        else:
-            logger.error('AP %s is misconfigured', currentAP)
 
 
 def get_wakeup_callback(scheduler, slack, config, default_emoji):
