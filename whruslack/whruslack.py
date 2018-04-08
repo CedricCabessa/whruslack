@@ -2,6 +2,7 @@ import sys
 import os
 import logging
 import configparser
+import time
 
 import appdirs
 
@@ -13,11 +14,15 @@ from whruslack.slack import Slack
 
 def scan_wifi_and_update_status(slack, roomconfig, default_emoji):
     logger = logging.getLogger("whruslack")
-    currentAP = wififactory.getwifi().wifiAP()
-    if not currentAP:
+    for _ in range(0, 10):
+        currentAP = wififactory.getwifi().wifiAP()
+        if currentAP:
+            currentAP = currentAP.lower()
+            break
+        time.sleep(1)
+    else:
         logger.debug("currentAP is None")
         return
-    currentAP = currentAP.lower()
 
     for status in roomconfig:
         if status == 'app' or status == 'DEFAULT':
@@ -51,8 +56,7 @@ def get_wakeup_callback(scheduler, slack, config, default_emoji):
 
 def get_sleep_callback(scheduler, slack):
     def _sleep_callback():
-        # executed in caller thread, will block the shutdown process
-        slack.resetstatus()
+        scheduler.call_soon(slack.resetstatus)
         scheduler.pause()
     return _sleep_callback
 

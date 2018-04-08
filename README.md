@@ -45,5 +45,25 @@ Logs are available with:
 journalctl --user -u whruslack.service
 ```
 
-Note that `whruslack` use `dbus` and `systemd-logind` to detect shutdown and sleep
-event.
+Note that `whruslack` use `dbus` and `systemd-logind` to detect shutdown and
+sleep event.
+
+### Hibernation
+
+We detect hibernation in order to clear your slack status when you close your
+laptop.
+
+However, NetworkManager shutdown the wifi interface on hibernation, so we cannot
+send the request to the slack API.
+
+A workaround consist of delay the wifi shutdown, this can be done with the
+following command
+
+```
+sudo tee /etc/NetworkManager/dispatcher.d/pre-down.d/11-whruslack.sh << EOF
+#!/bin/sh
+sleep 2
+EOF
+
+sudo chmod +x /etc/NetworkManager/dispatcher.d/pre-down.d/11-whruslack.sh
+```
