@@ -17,6 +17,7 @@ def scan_wifi_and_update_status(slack, roomconfig, default_emoji):
     if not currentAP:
         logger.debug("currentAP is None")
         return
+    currentAP = currentAP.lower()
 
     for status in roomconfig:
         if status == 'app' or status == 'DEFAULT':
@@ -25,7 +26,7 @@ def scan_wifi_and_update_status(slack, roomconfig, default_emoji):
         if 'ap' not in room:
             logger.error("no 'ap' for %s", status)
             return
-        ap = [ x.strip() for x in room['ap'].split(',') ]
+        ap = [ x.strip().lower() for x in room['ap'].split(',') ]
         if currentAP in ap:
             emoji = default_emoji
             if 'emoji' in room:
