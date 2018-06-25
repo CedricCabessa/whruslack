@@ -5,6 +5,7 @@ import logging
 
 logger = logging.getLogger("whruslack")
 
+
 class Slack:
     def __init__(self, token):
         self.token = token
@@ -20,10 +21,11 @@ class Slack:
         payload = '{"profile": {"status_text": "%s","status_emoji": "%s"}}' % \
                   (status, emoji)
 
-        req = urllib.request.Request('https://api.slack.com/api/users.profile.set',
-                                     payload.encode('utf-8'),
-                                     headers={'Content-Type':'application/json; charset=utf-8',
-                                              'Authorization': 'Bearer %s' % self.token})
+        req = urllib.request.Request(
+            'https://api.slack.com/api/users.profile.set',
+            payload.encode('utf-8'),
+            headers={'Content-Type': 'application/json; charset=utf-8',
+                     'Authorization': 'Bearer %s' % self.token})
 
         try:
             with urllib.request.urlopen(req) as f:

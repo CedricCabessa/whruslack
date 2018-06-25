@@ -1,5 +1,6 @@
 import sys
 
+
 def getwifi():
     if sys.platform.startswith('linux'):
         import whruslack.linux.wifi

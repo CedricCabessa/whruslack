@@ -1,11 +1,12 @@
 import sys
 
+
 def getsleepmonitor(sleep_callback, wakeup_callback):
     """ Return an os specific class with the following method.
 
     run(): start a thread to watch for sleep or shutdown signal
     stop(): stop the thread
-    
+
     User should provide 2 callback:
     sleep_callback -- called when sleep or shutdown is detected
     wakeup_callback -- called when coming back from sleep

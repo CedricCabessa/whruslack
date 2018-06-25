@@ -1,10 +1,12 @@
 import subprocess
 import re
 
+
 class Wifi:
     def wifiAP(self):
         out = subprocess.run([
-            '/System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport',
+            '/System/Library/PrivateFrameworks/Apple80211.framework/'
+            'Versions/Current/Resources/airport',
             '-I'
             ], stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
         match = re.search('BSSID: (([0-9A-Fa-f]{2}:?){6})',
@@ -13,4 +15,3 @@ class Wifi:
             return match.group(1)
 
         return None
-

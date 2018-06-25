@@ -25,7 +25,6 @@ class SleepMonitor(Thread):
             self.wakeup_cb()
             self.__inhibit()
 
-
     def __setup(self):
         DBusGMainLoop(set_as_default=True)
         system_bus = dbus.SystemBus()

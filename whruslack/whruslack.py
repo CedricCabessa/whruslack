@@ -31,7 +31,7 @@ def scan_wifi_and_update_status(slack, roomconfig, default_emoji):
         if 'ap' not in room:
             logger.error("no 'ap' for %s", status)
             return
-        ap = [ x.strip().lower() for x in room['ap'].split(',') ]
+        ap = [x.strip().lower() for x in room['ap'].split(',')]
         if currentAP in ap:
             emoji = default_emoji
             if 'emoji' in room:
@@ -50,7 +50,8 @@ def scan_wifi_and_update_status(slack, roomconfig, default_emoji):
 def get_wakeup_callback(scheduler, slack, config, default_emoji):
     def _wakeup_callback():
         scheduler.resume()
-        scheduler.call_soon(scan_wifi_and_update_status, slack, config, default_emoji)
+        scheduler.call_soon(scan_wifi_and_update_status, slack, config,
+                            default_emoji)
     return _wakeup_callback
 
 
@@ -62,8 +63,9 @@ def get_sleep_callback(scheduler, slack):
 
 
 def main():
-    logging.basicConfig(level=logging.DEBUG,
-                        format="%(levelname)s:%(process)d:%(threadName)s:%(message)s")
+    logging.basicConfig(
+        level=logging.DEBUG,
+        format="%(levelname)s:%(process)d:%(threadName)s:%(message)s")
     logger = logging.getLogger("whruslack")
 
     configfile = os.path.join(appdirs.user_config_dir("whruslack"),
@@ -89,12 +91,14 @@ def main():
     scheduler = Scheduler(refresh_period)
 
     sleepmonitor = \
-        sleepmonitorfactory.getsleepmonitor(get_sleep_callback(scheduler, slack),
-                                            get_wakeup_callback(scheduler, slack,
-                                                                config, default_emoji))
+        sleepmonitorfactory.getsleepmonitor(
+            get_sleep_callback(scheduler, slack),
+            get_wakeup_callback(scheduler, slack,
+                                config, default_emoji))
 
     sleepmonitor.start()
     scheduler.set_quit_cb(sleepmonitor.stop)
-    scheduler.schedule(scan_wifi_and_update_status, slack, config, default_emoji)
+    scheduler.schedule(scan_wifi_and_update_status, slack,
+                       config, default_emoji)
 
     slack.resetstatus()

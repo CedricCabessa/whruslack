@@ -1,11 +1,12 @@
 import signal
 import asyncio
 
+
 class Scheduler:
-    """ Configure asyncio and call a callback (see schedule) every :refresh_period:.
+    """ Configure asyncio and call a callback (see schedule) every
+    :refresh_period:.
     You can also add a callback to be called when the scheduling finish with
     :set_quit_cb:
-    
     """
     def __init__(self, refresh_period):
         self.loop = asyncio.get_event_loop()
@@ -56,7 +57,6 @@ class Scheduler:
             fn(*args)
 
         self.quit_cb = _quit_cb
-
 
     def call_soon(self, fn, *args):
         """ Call on the main thread as soon as possible

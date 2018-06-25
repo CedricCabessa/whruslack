@@ -1,6 +1,7 @@
 import subprocess
 import re
 
+
 class Wifi:
     def wifiAP(self):
         # stupidly return the first Access Point
