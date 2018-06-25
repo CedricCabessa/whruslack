@@ -38,7 +38,14 @@ def scan_wifi_and_update_status(slack, roomconfig, default_emoji):
                 emoji = room['emoji']
 
             if emoji:
-                slack.changestatus(status, emoji)
+                for _ in range(0, 10):
+                    try:
+                        slack.changestatus(status, emoji)
+                    except Exception as e:
+                        logger.error("error %s", e)
+                        time.sleep(5)
+                    else:
+                        break
             else:
                 logger.error('"%s" is misconfigured', status)
             break
