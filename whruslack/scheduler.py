@@ -38,7 +38,7 @@ class Scheduler:
         The scheduling stop on SIGTERM and SIGINT
         """
         def _callback():
-            return command.default_action(*args)
+            return command.reload(*args)
         self.callback = _callback
 
         self.resume()

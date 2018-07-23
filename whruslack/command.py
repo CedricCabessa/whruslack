@@ -11,7 +11,7 @@ class Command:
         self.roomconfig = roomconfig
         self.default_emoji = default_emoji
 
-    def default_action(self):
+    def reload(self):
         self.scan_wifi_and_update_status()
 
     def scan_wifi_and_update_status(self):
