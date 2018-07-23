@@ -33,12 +33,12 @@ class Scheduler:
         self.handle_rearm = self.loop.call_later(self.refresh_period,
                                                  self.resume)
 
-    def schedule(self, callback, *args):
+    def schedule(self, command, *args):
         """ schedule a callback to be called every :refresh_period: second
         The scheduling stop on SIGTERM and SIGINT
         """
         def _callback():
-            return callback(*args)
+            return command.default_action(*args)
         self.callback = _callback
 
         self.resume()

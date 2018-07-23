@@ -2,69 +2,24 @@ import sys
 import os
 import logging
 import configparser
-import time
-
 import appdirs
 
-from whruslack import wififactory
 from whruslack import sleepmonitorfactory
 from whruslack.scheduler import Scheduler
 from whruslack.slack import Slack
+from whruslack.command import Command
 
 
-def scan_wifi_and_update_status(slack, roomconfig, default_emoji):
-    logger = logging.getLogger("whruslack")
-    for _ in range(0, 10):
-        currentAP = wififactory.getwifi().wifiAP()
-        if currentAP:
-            currentAP = currentAP.lower()
-            break
-        time.sleep(1)
-    else:
-        logger.debug("currentAP is None")
-        return
-
-    for status in roomconfig:
-        if status == 'app' or status == 'DEFAULT':
-            continue
-        room = roomconfig[status]
-        if 'ap' not in room:
-            logger.error("no 'ap' for %s", status)
-            return
-        ap = [x.strip().lower() for x in room['ap'].split(',')]
-        if currentAP in ap:
-            emoji = default_emoji
-            if 'emoji' in room:
-                emoji = room['emoji']
-
-            if emoji:
-                for _ in range(0, 10):
-                    try:
-                        slack.changestatus(status, emoji)
-                    except Exception as e:
-                        logger.error("error %s", e)
-                        time.sleep(5)
-                    else:
-                        break
-            else:
-                logger.error('"%s" is misconfigured', status)
-            break
-    else:
-        logger.info('unknown wifi, reset status')
-        slack.resetstatus()
-
-
-def get_wakeup_callback(scheduler, slack, config, default_emoji):
+def get_wakeup_callback(scheduler, command):
     def _wakeup_callback():
         scheduler.resume()
-        scheduler.call_soon(scan_wifi_and_update_status, slack, config,
-                            default_emoji)
+        scheduler.call_soon(command.scan_wifi_and_update_status)
     return _wakeup_callback
 
 
-def get_sleep_callback(scheduler, slack):
+def get_sleep_callback(scheduler, command):
     def _sleep_callback():
-        scheduler.call_soon(slack.resetstatus)
+        scheduler.call_soon(command.resetstatus)
         scheduler.pause()
     return _sleep_callback
 
@@ -96,16 +51,14 @@ def main():
         default_emoji = config['app']['default_emoji']
 
     scheduler = Scheduler(refresh_period)
-
+    command = Command(slack, config, default_emoji)
     sleepmonitor = \
         sleepmonitorfactory.getsleepmonitor(
-            get_sleep_callback(scheduler, slack),
-            get_wakeup_callback(scheduler, slack,
-                                config, default_emoji))
+            get_sleep_callback(scheduler, command),
+            get_wakeup_callback(scheduler, command))
 
     sleepmonitor.start()
     scheduler.set_quit_cb(sleepmonitor.stop)
-    scheduler.schedule(scan_wifi_and_update_status, slack,
-                       config, default_emoji)
+    scheduler.schedule(command)
 
     slack.resetstatus()
