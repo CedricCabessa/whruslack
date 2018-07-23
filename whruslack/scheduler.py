@@ -1,5 +1,9 @@
 import signal
 import asyncio
+import logging
+
+SOCKET = '/tmp/whruslack.sock'
+logger = logging.getLogger("whruslack")
 
 
 class Scheduler:
@@ -33,6 +37,11 @@ class Scheduler:
         self.handle_rearm = self.loop.call_later(self.refresh_period,
                                                  self.resume)
 
+    def try_send_message(self, message):
+        coro_client = self.loop.create_unix_connection(
+            lambda: ProtoClient(self.loop, message), SOCKET)
+        self.loop.run_until_complete(coro_client)
+
     def schedule(self, command, *args):
         """ schedule a callback to be called every :refresh_period: second
         The scheduling stop on SIGTERM and SIGINT
@@ -49,6 +58,9 @@ class Scheduler:
         # call once immediately
         self.callback()
 
+        coro_server = self.loop.create_unix_server(
+            lambda: ProtoServer(command), SOCKET)
+        self.loop.run_until_complete(coro_server)
         self.loop.run_forever()
 
     def set_quit_cb(self, fn, *args):
@@ -63,3 +75,48 @@ class Scheduler:
         This method can be called from another thread.
         """
         self.loop.call_soon_threadsafe(fn, *args)
+
+
+class ProtoClient(asyncio.Protocol):
+    def __init__(self, loop, message):
+        self.message = message
+        self.loop = loop
+
+    def connection_made(self, transport):
+        transport.write(self.message)
+
+    def connection_lost(self, exc):
+        pass
+
+    def data_received(self, data):
+        if data == b'OK':
+            self.loop.stop()
+
+    def eof_received(self):
+        pass
+
+
+class ProtoServer(asyncio.Protocol):
+    def __init__(self, command):
+        self.command = command
+
+    def connection_made(self, transport):
+        self.transport = transport
+
+    def connection_lost(self, exc):
+        pass
+
+    def data_received(self, data):
+        logger.debug("data_received %s", data)
+        if data == b'reload':
+            self.command.reload()
+        elif data == b'meeting':
+            self.command.meeting()
+        elif data == b'ping':
+            pass
+        else:
+            logger.error('unknown command')
+        self.transport.write(b'OK')
+
+    def eof_received(self):
+        pass

@@ -24,6 +24,30 @@ def get_sleep_callback(scheduler, command):
     return _sleep_callback
 
 
+def try_client(scheduler, args):
+    if len(args) == 1 and args[0] == 'reload':
+        scheduler.try_send_message(b'reload')
+    elif len(args) == 1 and args[0] == 'ping':
+        scheduler.try_send_message(b'ping')
+    elif len(args) == 1 and args[0] == 'meeting':
+        scheduler.try_send_message(b'meeting')
+    else:
+        print('unknown command or invalid syntax')
+
+
+def server(scheduler, slack, config, default_emoji):
+    command = Command(slack, config, default_emoji)
+    sleepmonitor = \
+        sleepmonitorfactory.getsleepmonitor(
+            get_sleep_callback(scheduler, command),
+            get_wakeup_callback(scheduler, command))
+    sleepmonitor.start()
+    scheduler.set_quit_cb(sleepmonitor.stop)
+    scheduler.schedule(command)
+
+    slack.resetstatus()
+
+
 def main():
     logging.basicConfig(
         level=logging.DEBUG,
@@ -51,14 +75,15 @@ def main():
         default_emoji = config['app']['default_emoji']
 
     scheduler = Scheduler(refresh_period)
-    command = Command(slack, config, default_emoji)
-    sleepmonitor = \
-        sleepmonitorfactory.getsleepmonitor(
-            get_sleep_callback(scheduler, command),
-            get_wakeup_callback(scheduler, command))
-
-    sleepmonitor.start()
-    scheduler.set_quit_cb(sleepmonitor.stop)
-    scheduler.schedule(command)
-
-    slack.resetstatus()
+    if len(sys.argv) > 1:
+        try:
+            # client mode?
+            try_client(scheduler, sys.argv[1:])
+        except (ConnectionRefusedError, FileNotFoundError):
+            print("no server running, launch it with no argument")
+    else:
+        try:
+            try_client(scheduler, ["ping"])
+            print("pong")
+        except (ConnectionRefusedError, FileNotFoundError):
+            server(scheduler, slack, config, default_emoji)

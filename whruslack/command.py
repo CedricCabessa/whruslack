@@ -57,3 +57,6 @@ class Command:
 
     def resetstatus(self):
         self.slack.resetstatus()
+
+    def meeting(self):
+        self.slack.changestatus('in a meeting', ':calendar:')
