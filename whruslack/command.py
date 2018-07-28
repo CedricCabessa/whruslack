@@ -1,11 +1,15 @@
 import time
 import logging
+from urllib.error import URLError
 from whruslack import wififactory
 
 logger = logging.getLogger("whruslack")
 
 
 class Command:
+    """ Implement command sent by the client and the default behavior
+    :default():
+    """
     def __init__(self, slack, roomconfig, default_emoji):
         self.slack = slack
         self.roomconfig = roomconfig
@@ -32,19 +36,19 @@ class Command:
 
     def reload(self):
         if not self.status_override_cmd:
-            self.scan_wifi_and_update_status()
+            self.__scan_wifi_and_update_status()
         else:
             logger.debug("status is overridden")
 
-    def scan_wifi_and_update_status(self):
+    def __scan_wifi_and_update_status(self):
         for _ in range(0, 10):
-            currentAP = wififactory.getwifi().wifiAP()
-            if currentAP:
-                currentAP = currentAP.lower()
+            current_ap = wififactory.getwifi().wifi_ap()
+            if current_ap:
+                current_ap = current_ap.lower()
                 break
             time.sleep(1)
         else:
-            logger.debug("currentAP is None")
+            logger.debug("current AP is None")
             return
 
         for status in self.roomconfig:
@@ -54,8 +58,8 @@ class Command:
             if 'ap' not in room:
                 logger.error("no 'ap' for %s", status)
                 return
-            ap = [x.strip().lower() for x in room['ap'].split(',')]
-            if currentAP in ap:
+            configured_aps = [x.strip().lower() for x in room['ap'].split(',')]
+            if current_ap in configured_aps:
                 emoji = self.default_emoji
                 if 'emoji' in room:
                     emoji = room['emoji']
@@ -64,8 +68,8 @@ class Command:
                     for _ in range(0, 10):
                         try:
                             self.slack.changestatus(status, emoji)
-                        except Exception as e:
-                            logger.error("error %s", e)
+                        except URLError as exc:
+                            logger.error("error %s", exc)
                             time.sleep(5)
                         else:
                             break

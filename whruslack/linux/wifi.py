@@ -3,7 +3,7 @@ import re
 
 
 class Wifi:
-    def wifiAP(self):
+    def wifi_ap(self):
         # stupidly return the first Access Point
         out = subprocess.run(['iwconfig'], stdout=subprocess.PIPE,
                              stderr=subprocess.DEVNULL)

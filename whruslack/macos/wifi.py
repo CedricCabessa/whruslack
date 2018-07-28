@@ -3,7 +3,7 @@ import re
 
 
 class Wifi:
-    def wifiAP(self):
+    def wifi_ap(self):
         out = subprocess.run([
             '/System/Library/PrivateFrameworks/Apple80211.framework/'
             'Versions/Current/Resources/airport',

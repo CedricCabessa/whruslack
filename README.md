@@ -67,3 +67,16 @@ EOF
 
 sudo chmod +x /etc/NetworkManager/dispatcher.d/pre-down.d/11-whruslack.sh
 ```
+
+## Usage
+
+When the service is running, you can dynamically change the configuration with
+the client.
+
+A few predefined status are coded (TODO: make it configurable):
+
+`whruslack meeting`
+change the status to "meeting"
+
+`whruslack holiday "back on Monday the 1st"`
+change the status to "holiday", this status be followed by a free form text.

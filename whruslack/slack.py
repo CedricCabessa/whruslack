@@ -28,13 +28,13 @@ class Slack:
                      'Authorization': 'Bearer %s' % self.token})
 
         try:
-            with urllib.request.urlopen(req) as f:
-                response = json.loads(f.read().decode('utf-8'))
-                if not response['ok']:
-                    logger.error('error from slack api: %s', response['error'])
+            with urllib.request.urlopen(req) as response:
+                status = json.loads(response.read().decode('utf-8'))
+                if not status['ok']:
+                    logger.error('error from slack api: %s', status['error'])
 
-        except HTTPError as e:
-            logger.error("http errror %s", e)
+        except HTTPError as exc:
+            logger.error("http errror %s", exc)
 
     def changestatus(self, status, emoji):
         self.__dochangestatus(status, emoji)

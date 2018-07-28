@@ -1,3 +1,9 @@
+""" Ayncio based timer and client server.
+The server wait to refresh the wifi status and listen for command coming from
+the client command line
+Client and server are implemented in :ProtoClient: and :ProtoServer:
+"""
+
 import signal
 import asyncio
 import logging

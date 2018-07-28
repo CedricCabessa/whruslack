@@ -13,7 +13,7 @@ from whruslack.command import Command
 def get_wakeup_callback(scheduler, command):
     def _wakeup_callback():
         scheduler.resume()
-        scheduler.call_soon(command.scan_wifi_and_update_status)
+        scheduler.call_soon(command.default)
     return _wakeup_callback
 
 
@@ -41,6 +41,8 @@ def try_client(scheduler, args):
 
 
 def server(scheduler, slack, config, default_emoji):
+    """ Configure and start the server
+    """
     command = Command(slack, config, default_emoji)
     sleepmonitor = \
         sleepmonitorfactory.getsleepmonitor(
