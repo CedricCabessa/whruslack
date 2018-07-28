@@ -26,13 +26,18 @@ def get_sleep_callback(scheduler, command):
 
 def try_client(scheduler, args):
     if len(args) == 1 and args[0] == 'reload':
-        scheduler.try_send_message(b'reload')
+        return scheduler.try_send_message(b'reload')
     elif len(args) == 1 and args[0] == 'ping':
-        scheduler.try_send_message(b'ping')
+        return scheduler.try_send_message(b'ping')
     elif len(args) == 1 and args[0] == 'meeting':
-        scheduler.try_send_message(b'meeting')
-    else:
-        print('unknown command or invalid syntax')
+        return scheduler.try_send_message(b'meeting')
+    elif len(args) == 2 and args[0] == 'holiday':
+        return scheduler.try_send_message(b'holiday;%s' % args[1].encode())
+    elif len(args) == 1 and args[0] == 'default':
+        return scheduler.try_send_message(b'default')
+
+    print('unknown command or invalid syntax')
+    return 'ERROR'
 
 
 def server(scheduler, slack, config, default_emoji):
@@ -78,12 +83,13 @@ def main():
     if len(sys.argv) > 1:
         try:
             # client mode?
-            try_client(scheduler, sys.argv[1:])
+            reply = try_client(scheduler, sys.argv[1:])
+            assert reply == 'OK' or reply == 'ERROR'
         except (ConnectionRefusedError, FileNotFoundError):
             print("no server running, launch it with no argument")
     else:
         try:
-            try_client(scheduler, ["ping"])
-            print("pong")
+            reply = try_client(scheduler, ["ping"])
+            print(reply)
         except (ConnectionRefusedError, FileNotFoundError):
             server(scheduler, slack, config, default_emoji)

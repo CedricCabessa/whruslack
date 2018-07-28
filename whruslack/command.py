@@ -10,9 +10,31 @@ class Command:
         self.slack = slack
         self.roomconfig = roomconfig
         self.default_emoji = default_emoji
+        self.status_override_cmd = None
+
+    def handle_message(self, msg):
+        if msg == 'reload':
+            self.reload()
+        elif msg == 'meeting':
+            self.meeting()
+        elif msg == 'default':
+            self.default()
+        elif msg.startswith('holiday;'):
+            self.holiday(msg[msg.index(';') + 1:])
+        elif msg == 'ping':
+            if self.status_override_cmd:
+                return self.status_override_cmd
+            return "default"
+        else:
+            logger.error('unknown command')
+            return None
+        return "OK"
 
     def reload(self):
-        self.scan_wifi_and_update_status()
+        if not self.status_override_cmd:
+            self.scan_wifi_and_update_status()
+        else:
+            logger.debug("status is overridden")
 
     def scan_wifi_and_update_status(self):
         for _ in range(0, 10):
@@ -58,4 +80,13 @@ class Command:
         self.slack.resetstatus()
 
     def meeting(self):
+        self.status_override_cmd = 'meeting'
         self.slack.changestatus('in a meeting', ':calendar:')
+
+    def holiday(self, msg):
+        self.status_override_cmd = 'holiday'
+        self.slack.changestatus('Vacationing %s' % msg, ':palm_tree:')
+
+    def default(self):
+        self.status_override_cmd = None
+        self.reload()

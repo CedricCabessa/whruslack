@@ -40,7 +40,9 @@ class Scheduler:
     def try_send_message(self, message):
         coro_client = self.loop.create_unix_connection(
             lambda: ProtoClient(self.loop, message), SOCKET)
-        self.loop.run_until_complete(coro_client)
+        ret = self.loop.run_until_complete(coro_client)
+        self.loop.run_forever()
+        return ret[1].reply
 
     def schedule(self, command, *args):
         """ schedule a callback to be called every :refresh_period: second
@@ -81,6 +83,7 @@ class ProtoClient(asyncio.Protocol):
     def __init__(self, loop, message):
         self.message = message
         self.loop = loop
+        self.reply = None
 
     def connection_made(self, transport):
         transport.write(self.message)
@@ -89,7 +92,8 @@ class ProtoClient(asyncio.Protocol):
         pass
 
     def data_received(self, data):
-        if data == b'OK':
+        if data:
+            self.reply = data.decode()
             self.loop.stop()
 
     def eof_received(self):
@@ -99,6 +103,7 @@ class ProtoClient(asyncio.Protocol):
 class ProtoServer(asyncio.Protocol):
     def __init__(self, command):
         self.command = command
+        self.transport = None
 
     def connection_made(self, transport):
         self.transport = transport
@@ -108,15 +113,9 @@ class ProtoServer(asyncio.Protocol):
 
     def data_received(self, data):
         logger.debug("data_received %s", data)
-        if data == b'reload':
-            self.command.reload()
-        elif data == b'meeting':
-            self.command.meeting()
-        elif data == b'ping':
-            pass
-        else:
-            logger.error('unknown command')
-        self.transport.write(b'OK')
+        reply = self.command.handle_message(data.decode())
+        if reply:
+            self.transport.write(reply.encode())
 
     def eof_received(self):
         pass
