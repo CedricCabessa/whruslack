@@ -15,7 +15,6 @@ class Command:
         self.scan_wifi_and_update_status()
 
     def scan_wifi_and_update_status(self):
-        logger = logging.getLogger("whruslack")
         for _ in range(0, 10):
             currentAP = wififactory.getwifi().wifiAP()
             if currentAP:
