@@ -26,7 +26,7 @@ See this [example](whruslack.ini)
 Whruslack use setuptools, so you should simply use:
 
 ```
- $ ./setup.py install --user
+ $ pip install .
 ```
 
 ### linux
