@@ -1,7 +1,7 @@
 import logging
 from threading import Thread
 
-logger = logging.getLogger('whruslack')
+logger = logging.getLogger("whruslack")
 
 
 class SleepMonitor(Thread):
@@ -11,9 +11,11 @@ class SleepMonitor(Thread):
         self.wakeup_cb = wakeup_callback
 
     def run(self):
-        logger.warning("macos version of SleepMonitor not implemented, "
-                       "please send me a patch")
+        logger.warning(
+            "macos version of SleepMonitor not implemented, " "please send me a patch"
+        )
 
     def stop(self):
-        logger.warning("macos version of SleepMonitor not implemented, "
-                       "please send me a patch")
+        logger.warning(
+            "macos version of SleepMonitor not implemented, " "please send me a patch"
+        )

@@ -8,7 +8,7 @@ import signal
 import asyncio
 import logging
 
-SOCKET = '/tmp/whruslack.sock'
+SOCKET = "/tmp/whruslack.sock"
 logger = logging.getLogger("whruslack")
 
 
@@ -18,6 +18,7 @@ class Scheduler:
     You can also add a callback to be called when the scheduling finish with
     :set_quit_cb:
     """
+
     def __init__(self, refresh_period):
         self.loop = asyncio.get_event_loop()
         self.refresh_period = refresh_period
@@ -38,14 +39,13 @@ class Scheduler:
 
     def resume(self):
         """ Resume scheduling after pause """
-        self.handle_callback = self.loop.call_later(self.refresh_period,
-                                                    self.callback)
-        self.handle_rearm = self.loop.call_later(self.refresh_period,
-                                                 self.resume)
+        self.handle_callback = self.loop.call_later(self.refresh_period, self.callback)
+        self.handle_rearm = self.loop.call_later(self.refresh_period, self.resume)
 
     def try_send_message(self, message):
         coro_client = self.loop.create_unix_connection(
-            lambda: ProtoClient(self.loop, message), SOCKET)
+            lambda: ProtoClient(self.loop, message), SOCKET
+        )
         ret = self.loop.run_until_complete(coro_client)
         self.loop.run_forever()
         return ret[1].reply
@@ -54,8 +54,10 @@ class Scheduler:
         """ schedule a callback to be called every :refresh_period: second
         The scheduling stop on SIGTERM and SIGINT
         """
+
         def _callback():
             return command.reload(*args)
+
         self.callback = _callback
 
         self.resume()
@@ -66,13 +68,13 @@ class Scheduler:
         # call once immediately
         self.callback()
 
-        coro_server = self.loop.create_unix_server(
-            lambda: ProtoServer(command), SOCKET)
+        coro_server = self.loop.create_unix_server(lambda: ProtoServer(command), SOCKET)
         self.loop.run_until_complete(coro_server)
         self.loop.run_forever()
 
     def set_quit_cb(self, fn, *args):
         """ add a callback to be called when scheduling finish"""
+
         def _quit_cb():
             fn(*args)
 

@@ -18,20 +18,25 @@ class Slack:
 
         logger.info('status "%s" emoji "%s"', status, emoji)
 
-        payload = '{"profile": {"status_text": "%s","status_emoji": "%s"}}' % \
-                  (status, emoji)
+        payload = '{"profile": {"status_text": "%s","status_emoji": "%s"}}' % (
+            status,
+            emoji,
+        )
 
         req = urllib.request.Request(
-            'https://api.slack.com/api/users.profile.set',
-            payload.encode('utf-8'),
-            headers={'Content-Type': 'application/json; charset=utf-8',
-                     'Authorization': 'Bearer %s' % self.token})
+            "https://api.slack.com/api/users.profile.set",
+            payload.encode("utf-8"),
+            headers={
+                "Content-Type": "application/json; charset=utf-8",
+                "Authorization": "Bearer %s" % self.token,
+            },
+        )
 
         try:
             with urllib.request.urlopen(req) as response:
-                status = json.loads(response.read().decode('utf-8'))
-                if not status['ok']:
-                    logger.error('error from slack api: %s', status['error'])
+                status = json.loads(response.read().decode("utf-8"))
+                if not status["ok"]:
+                    logger.error("error from slack api: %s", status["error"])
 
         except HTTPError as exc:
             logger.error("http errror %s", exc)
