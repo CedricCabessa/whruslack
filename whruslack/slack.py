@@ -1,7 +1,7 @@
-import urllib.request
-from urllib.error import HTTPError
 import json
 import logging
+import urllib.request
+from urllib.error import HTTPError
 
 logger = logging.getLogger("whruslack")
 

@@ -4,9 +4,9 @@ the client command line
 Client and server are implemented in :ProtoClient: and :ProtoServer:
 """
 
-import signal
 import asyncio
 import logging
+import signal
 
 SOCKET = "/tmp/whruslack.sock"
 logger = logging.getLogger("whruslack")

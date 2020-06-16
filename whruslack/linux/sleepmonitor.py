@@ -1,5 +1,5 @@
-from threading import Thread
 import os
+from threading import Thread
 
 import dbus
 from dbus.mainloop.glib import DBusGMainLoop

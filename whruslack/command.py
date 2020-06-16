@@ -1,6 +1,7 @@
-import time
 import logging
+import time
 from urllib.error import URLError
+
 from whruslack import wififactory
 
 logger = logging.getLogger("whruslack")

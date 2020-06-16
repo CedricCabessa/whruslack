@@ -1,13 +1,14 @@
-import sys
-import os
-import logging
 import configparser
+import logging
+import os
+import sys
+
 import appdirs
 
 from whruslack import sleepmonitorfactory
+from whruslack.command import Command
 from whruslack.scheduler import Scheduler
 from whruslack.slack import Slack
-from whruslack.command import Command
 
 
 def get_wakeup_callback(scheduler, command):
